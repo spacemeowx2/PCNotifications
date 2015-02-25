@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">桌面通知</string>
+    <string name="show_name">桌面通知</string>
+    <string name="service_name">桌面通知</string>
+    <string name="service_description">把手机上的通知转发到电脑上</string>
+</resources>
