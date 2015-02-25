@@ -3,4 +3,9 @@
     <string name="show_name">PC Notifications</string>
     <string name="service_name">PC Notifications</string>
     <string name="service_description">Enable this service to send notifications to your PC.</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+
+    <string name="action_settings">Settings</string>
 </resources>

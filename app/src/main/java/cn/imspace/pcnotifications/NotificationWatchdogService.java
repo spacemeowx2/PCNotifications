@@ -5,6 +5,7 @@ package cn.imspace.pcnotifications;
 
 import android.accessibilityservice.*;
 import android.app.Notification;
+import android.content.SharedPreferences;
 import android.os.Parcelable;
 import android.view.accessibility.AccessibilityEvent;
 import android.util.Log;
@@ -25,9 +26,13 @@ public class NotificationWatchdogService extends AccessibilityService {
             Parcelable data = event.getParcelableData();
             if (data instanceof Notification) {
                 Notification notification = (Notification) data;
-                ActionReader actionReader = new ActionReader(notification.contentView);
-                System.out.println(actionReader.getTitleText());
-                System.out.println(actionReader.getContentText());
+                SharedPreferences sp = getSharedPreferences("connection", MODE_PRIVATE);
+                try {
+                    NotificationSender ns = new NotificationSender(notification, sp);
+                    ns.send();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

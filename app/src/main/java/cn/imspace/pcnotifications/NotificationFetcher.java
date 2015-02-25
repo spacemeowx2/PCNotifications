@@ -2,13 +2,15 @@ package cn.imspace.pcnotifications;
 
 import java.util.ArrayList;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.Date;
+import android.app.Notification;
 import android.widget.RemoteViews;
+import org.json.JSONObject;
 
 /**
  * Created by space on 15/2/25.
  */
-public class ActionReader {
+public class NotificationFetcher {
     public static final int ID_CONTENT_TEXT = 0x1020046;
     public static final int ID_TITLE_TEXT = 0x1020016;
     private Object getActions (RemoteViews remoteViews) throws Exception{
@@ -42,21 +44,46 @@ public class ActionReader {
         }
     }
     private ArrayList<BriefAction> mActions = new ArrayList<>();
-    String mTitleText="", mContentText="";
-    public String getTitleText() {
-        return mTitleText;
+    String mTitleText="", mContentText="", mPackage="";
+    long mPostTime=0;
+    int mId=0, mFlags=0;
+    boolean mHasId = false;
+    public void setPackage(String name) { mPackage = name;}
+    public void setPostTime(long time) {mPostTime = time;}
+    public JSONObject getJSONObject() {
+        JSONObject tNotification = new JSONObject();
+        try {
+            tNotification.put("title", mTitleText);
+            tNotification.put("content", mContentText);
+            tNotification.put("package", mPackage);
+            tNotification.put("posttime", mPostTime);
+            tNotification.put("flags", mFlags);
+            if (mHasId) {
+                tNotification.put("id", mId);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return tNotification;
     }
-    public String getContentText() {
-        return mContentText;
-    }
-    public ActionReader(RemoteViews remoteViews) {
+    public NotificationFetcher(Notification notification) {
         //@RemoteViews.java:1714
+        this(notification, 0);
+        mHasId = false;
+    }
+    public NotificationFetcher(Notification notification, int id) {
+        mId = id;
+        mHasId = true;
+        mPostTime = new Date().getTime();
+        mFlags = notification.flags;
+        RemoteViews remoteViews = notification.contentView;
         ArrayList<Object> actions;
         try {
+            mPackage = remoteViews.getPackage();
             actions = (ArrayList<Object>) getActions(remoteViews);
         } catch (Exception e) {
             actions = new ArrayList<Object>();
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         for (Object action: actions) {
             Object tMethodName, tValue, tViewId;
@@ -79,6 +106,10 @@ public class ActionReader {
                 mTitleText = action.value.toString();
             } else if (action.viewId == ID_CONTENT_TEXT) {
                 mContentText = action.value.toString();
+            } else {
+                System.out.println("Unknown Text");
+                System.out.println(action.value.toString());
+                System.out.println(action.viewId);
             }
         }
     }

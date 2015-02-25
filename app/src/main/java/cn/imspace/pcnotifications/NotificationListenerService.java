@@ -2,7 +2,9 @@ package cn.imspace.pcnotifications;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.content.SharedPreferences;
 import android.service.notification.StatusBarNotification;
+import android.support.v4.app.NotificationCompat;
 
 /**
  * Created by space on 15/2/25.
@@ -11,15 +13,28 @@ import android.service.notification.StatusBarNotification;
 public class NotificationListenerService extends android.service.notification.NotificationListenerService {
     public void onNotificationPosted(StatusBarNotification sbn) {
         Notification notification = sbn.getNotification();
-
-        ActionReader actionReader = new ActionReader(notification.contentView);
-        System.out.println("Posted:");
-        System.out.println(actionReader.getTitleText());
-        System.out.println(actionReader.getContentText());
+        if ((notification.flags & NotificationCompat.FLAG_ONGOING_EVENT) == 0) {
+            SharedPreferences sp = getSharedPreferences("connection", MODE_PRIVATE);
+            try {
+                NotificationSender ns = new NotificationSender("Posted", sbn, sp);
+                ns.send();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println("Posted:");
+        }
     }
     public void onNotificationRemoved(StatusBarNotification sbn) {
-
         Notification notification = sbn.getNotification();
-        System.out.println("Removed:");
+        if ((notification.flags & NotificationCompat.FLAG_ONGOING_EVENT) == 0) {
+            SharedPreferences sp = getSharedPreferences("connection", MODE_PRIVATE);
+            try {
+                NotificationSender ns = new NotificationSender("Removed", sbn, sp);
+                ns.send();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println("Removed:");
+        }
     }
 }
