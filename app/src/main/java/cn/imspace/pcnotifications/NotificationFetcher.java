@@ -13,7 +13,9 @@ import org.json.JSONObject;
  */
 public class NotificationFetcher {
     public static final int ID_CONTENT_TEXT = 0x1020046;
+    public static final int ID_CONTENT_TEXT2 = 0x7F0D0BA4;
     public static final int ID_TITLE_TEXT = 0x1020016;
+    public static final int ID_TITLE_TEXT2 = 0x7F0D0BA3;
     private static final String TAG = "Fetcher";
     private Object getActions (RemoteViews remoteViews) throws Exception{
         Class<?> remoteViewsType = remoteViews.getClass();
@@ -46,7 +48,7 @@ public class NotificationFetcher {
         }
     }
     private ArrayList<BriefAction> mActions = new ArrayList<>();
-    String mTitleText="", mContentText="", mPackage="", mId="";
+    String mTitleText=null, mContentText=null, mPackage="", mId="";
     long mPostTime=0;
     int mFlags=0;
     boolean mHasId = false;
@@ -103,16 +105,48 @@ public class NotificationFetcher {
         for (BriefAction action: toDelete) {
             mActions.remove(action);
         }
+        toDelete.clear();
+        int textCount=0;
         for (BriefAction action: mActions) {
-            if (action.viewId == ID_TITLE_TEXT) {
+            if (action.viewId == ID_TITLE_TEXT || action.viewId == ID_TITLE_TEXT2) {
                 mTitleText = action.value.toString();
-            } else if (action.viewId == ID_CONTENT_TEXT) {
+                toDelete.add(action);
+                textCount++;
+            } else if (action.viewId == ID_CONTENT_TEXT || action.viewId == ID_CONTENT_TEXT2) {
                 mContentText = action.value.toString();
+                toDelete.add(action);
+                textCount++;
             } else {
                 Log.w(TAG, "Unknown Text");
                 Log.w(TAG, action.value.toString());
                 Log.w(TAG, String.valueOf(action.viewId));
             }
+        }
+        for (BriefAction action: toDelete) {
+            mActions.remove(action);
+        }
+        switch(mActions.size()) {
+            case 0:
+                mTitleText = "";
+                mContentText = "";
+                break;
+            case 1:
+                if (textCount==0) {
+                    mTitleText = mActions.get(0).value.toString();
+                }
+                break;
+            default:
+                if (textCount==0) {
+                    mTitleText = mActions.get(0).value.toString();
+                    mContentText = mActions.get(1).value.toString();
+                } else if (textCount==1) {
+                    if (mTitleText == null) {
+                        mTitleText = mActions.get(0).value.toString();
+                    } else if (mContentText == null) {
+                        mContentText = mActions.get(0).value.toString();
+                    }
+                }
+                break;
         }
     }
 }

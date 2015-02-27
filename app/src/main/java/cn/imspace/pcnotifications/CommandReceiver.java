@@ -186,28 +186,33 @@ public  class CommandReceiver  {
             tReq.put("did", mcc.getDID());
             tReq.put("code", mcc.getCode());
             tReq.put("key", mcc.getKey());
+            tReq.put("name", mcc.getName());
         } catch (Exception e) {
             e.printStackTrace();
         }
         return tReq.toString();
     }
     private void get() {
-        if (!mStop) {
-            synchronized (mLock) {
-                if (mConnection>0) {
-                    Log.w(TAG, "Double run?");
+        if (mStop) {
+            Log.i(TAG, "Getter stopped because service stopped.");
+            return;
+        }
+        synchronized (mLock) {
+            if (mConnection>0) {
+                Log.e(TAG, "Double run?");
+                Exception e = new Exception();
+                e.printStackTrace();
 //                    try {
 //                        Thread.sleep(1000);
 //                    } catch (Exception e) {
 //                        e.printStackTrace();
 //                    }
-                    return;
-                }
+                return;
             }
-            getThread = new Thread(new httpGetter(mcc.getServer(), getGetString()));
-            getThread.start();
         }
-    }
+        getThread = new Thread(new httpGetter(mcc.getServer(), getGetString()));
+        getThread.start();
+        }
     protected void finalize() throws java.lang.Throwable {
         super.finalize();
     }

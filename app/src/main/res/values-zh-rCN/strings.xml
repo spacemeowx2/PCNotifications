@@ -4,4 +4,22 @@
     <string name="show_name">桌面通知</string>
     <string name="service_name">桌面通知</string>
     <string name="service_description">把手机上的通知转发到电脑上</string>
+    <string name="title_activity_main">桌面通知</string>
+
+    <string name="hello_world">你好世界!</string>
+
+    <string name="tab_setup">配置</string>
+    <string name="tab_apps">应用</string>
+    <string name="tab_history">历史</string>
+    <string name="apps_tip">提示</string>
+    <string name="text_setup_code_title">1. 设置Code</string>
+    <string name="text_setup_code_description">设置Code来区分用户(一个人应该拥有一个Code)</string>
+    <string name="text_setup_access_title">2. 通知权限</string>
+    <string name="text_setup_access_description">在"通知读取权限"中启用"桌面通知"的权限.</string>
+    <string name="open_system_settings">启用权限</string>
+    <string name="text_setup_pc_title">3. 电脑客户端安装</string>
+    <string name="text_setup_pc_description">在电脑上安装Chrome插件.\n\nhttp://somewhere/</string>
+    <string name="text_setup_test_title">4. 测试</string>
+    <string name="text_setup_test_description">按下面的按钮来测试功能.</string>
+    <string name="button_test">测试</string>
 </resources>

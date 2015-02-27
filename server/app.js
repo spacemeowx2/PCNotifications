@@ -32,9 +32,6 @@ function newCode(table) {
   }
   return tCode;
 }
-function needNewDID(args) {
-  return args.did=='debug';
-}
 var subHandler = {};
 (function (){
   subHandler.sendto = function sendto(args,ret) {
@@ -76,11 +73,14 @@ var subHandler = {};
     return ret;
   };
   subHandler.get = function get(args,ret) {
+    function needNewDID(args) {
+      return args.did=='debug';
+    }
     if (needNewDID(args)) {
       var newdid = newCode(deviceTable);
-      ret.cmd=did;
+      ret.cmd='did';
       ret.did=newdid;
-      deviceTable[newdid] = {name:'No Name',role:args.role,online:false,msgs:[]};
+      deviceTable[newdid] = {name:args.name,role:args.role,online:false,msgs:[]};
     } else if (deviceTable[args.did].msgs.length>0) {
       ret = deviceTable[args.did].msgs.shift();
       ret.ok = true;
@@ -96,14 +96,14 @@ function handler(args) {
     codeTable[args.code] = [];
   }
   if (!deviceTable.hasOwnProperty(args.did)) {
-    deviceTable[args.did] = {name:'No Name',role:args.role,lasttime:0,online:false,msgs:[]};
+    deviceTable[args.did] = {name:args.name,role:args.role,lasttime:0,online:false,msgs:[]};
   }
   if (codeTable[args.code].indexOf(args.did)==-1) {
     codeTable[args.code].push(args.did);
   }
+  deviceTable[args.did].name = args.name;
   var ret = {'ok':true};
   if (subHandler.hasOwnProperty(args.cmd)) {
-    console.log(subHandler[args.cmd])
     ret = subHandler[args.cmd](args,ret);
   } else {
     ret.ok = false;
@@ -118,7 +118,7 @@ http.createServer(function(req, res) {
   reqd.add(req);
   reqd.add(res);
   reqd.on('error', function(er) {
-    console.error('Error', er);
+    console.error('Error');
     if (mErr) {
       console.log('invoke err func');
       mErr();
@@ -146,7 +146,7 @@ http.createServer(function(req, res) {
   };
   req.addListener('close', function () {
     if (userdata) {
-      console.log('close',userdata);
+      //console.log('close',userdata);
       if (userdata.hasOwnProperty('did')) {
         if (deviceTable.hasOwnProperty(userdata.did)) {
           deviceTable[userdata.did].online = false;
@@ -170,7 +170,8 @@ http.createServer(function(req, res) {
       }
       var tRet;
       try {
-         tRet = handler(userdata);
+        //console.log(userdata.cmd, getClientIp(req));
+        tRet = handler(userdata);
       } catch (e) {
         res.write('Error: Handler.');
         res.end();
@@ -188,13 +189,45 @@ http.createServer(function(req, res) {
     }
   });
 }).listen(8765);
-setInterval(function (){
-  var c=0;
-  for (var i in deviceTable) {
-    if (deviceTable[i].online) {
-      c++;
+console.log("nodejs start listen 8765 port!");
+function getClientIp(req) {
+  return req.headers['x-forwarded-for'] ||
+  req.connection.remoteAddress ||
+  req.socket.remoteAddress ||
+  req.connection.socket.remoteAddress;
+};
+process.stdin.resume();
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', function (chunk) {
+  chunk = chunk.replace(/(.*?)[\r\n]+/,'$1');
+  if (chunk=='online') {
+    var c=0;
+    for (var i in deviceTable) {
+      if (deviceTable[i].online) {
+        c++;
+      }
     }
+    console.log("Online devices:",c);
+  } else if (chunk=='clearempty') {
+    var c=0;
+    for (var i in deviceTable) {
+      if (deviceTable[i].lasttime==0) {
+        c++;
+        delete deviceTable[i];
+      }
+    }
+    console.log("Cleared devices:",c);
+  } else if (chunk=='listd') {
+    for (var i in deviceTable) {
+      console.log(i, deviceTable[i].name);
+    }
+  } else if (chunk=='listo') {
+    for (var i in deviceTable) {
+      if (deviceTable[i].online) {
+        console.log(i, deviceTable[i].name);
+      }
+    }
+  } else {
+    console.log(chunk, 'no match');
   }
-  //console.log("Online Number:",c);
-}, 2000);
-console.log("nodejs start listen 8765 port!");  
+});

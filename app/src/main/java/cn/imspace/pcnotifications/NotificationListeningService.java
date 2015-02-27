@@ -29,7 +29,6 @@ public class NotificationListeningService extends NotificationListenerService {
     public void onNotificationPosted(StatusBarNotification sbn) {
         Notification notification = sbn.getNotification();
         if ((notification.flags & NotificationCompat.FLAG_ONGOING_EVENT) == 0) {
-            //SharedPreferences sp = getSharedPreferences("connection", MODE_PRIVATE);
             try {
                 NotificationSender ns = new NotificationSender("Posted", sbn, mcc);
                 ns.send();

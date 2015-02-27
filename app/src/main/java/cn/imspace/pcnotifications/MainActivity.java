@@ -1,14 +1,14 @@
 package cn.imspace.pcnotifications;
 //TODO  new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
 import android.app.NotificationManager;
-import android.content.ComponentName;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +17,16 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
+    private int mCount = 0;
     public void test(View view) {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder mBuilder = new NotificationCompat
                 .Builder(MainActivity.this)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("This is title.")
-                .setContentText("This is content.");
+                .setContentText("This is content. ["+(++mCount)+"]")
+                .setContentIntent(PendingIntent.getActivity(this, 0,
+                        new Intent(), PendingIntent.FLAG_UPDATE_CURRENT));
         mNotificationManager.notify(1, mBuilder.build());
     }
     public void openSystemSettings(View view) {
@@ -66,10 +69,9 @@ public class MainActivity extends ActionBarActivity {
 
         PagerTabStrip pagerTabStrip;
         pagerTabStrip=(PagerTabStrip) findViewById(R.id.pagertab);
-        pagerTabStrip.setTabIndicatorColor(0xffff00);
+        pagerTabStrip.setTabIndicatorColor(0x4286f5);
         pagerTabStrip.setDrawFullUnderline(false);
-        pagerTabStrip.setBackgroundColor(0xffffff);
-        pagerTabStrip.setTextSpacing(1);
+        pagerTabStrip.setBackgroundColor(0x000000);
 
         ArrayList<View> mViewList = new ArrayList<>();
         ArrayList<String> mTitleList = new ArrayList<>();

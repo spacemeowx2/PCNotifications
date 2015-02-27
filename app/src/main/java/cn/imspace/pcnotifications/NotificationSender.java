@@ -24,7 +24,7 @@ import org.json.*;
 
 public class NotificationSender {
     private NotificationFetcher mNotification;
-    private String mCode, mKey, mMethod, mDID;
+    private String mCode, mKey, mMethod, mDID, mName;
     private URI mURI;
     private int mRetry=0;
     private static final String TAG = "Sender";
@@ -38,6 +38,7 @@ public class NotificationSender {
                 tObj.put("code", mCode);
                 tObj.put("key", mKey);
                 tObj.put("did", mDID);
+                tObj.put("name", mName);
                 tObj.put("cmd", "broadcast");
                 tObj.put("dest", "[all]");
                 msg.put("notification", mNotification.getJSONObject());
@@ -87,6 +88,7 @@ public class NotificationSender {
         mCode = cc.getCode();
         mKey = cc.getKey();
         mDID = cc.getDID();
+        mName = cc.getName();
         mMethod = "Posted";
     }
     @TargetApi(18)
@@ -97,6 +99,7 @@ public class NotificationSender {
         mCode = cc.getCode();
         mKey = cc.getKey();
         mDID = cc.getDID();
+        mName = cc.getName();
         mMethod = method;
         mNotification.setPackage(sbn.getPackageName());
         mNotification.setPostTime(sbn.getPostTime());

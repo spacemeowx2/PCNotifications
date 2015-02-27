@@ -53,6 +53,9 @@ public class ConnectionConfig {
         //TODO
         return "debug";
     }
+    public String getName() {
+        return mConnection.getString("name", android.os.Build.MODEL);
+    }
     public void setDID(String did) {
         mServerSPE.putString(getServerString(), did).commit();
     }
