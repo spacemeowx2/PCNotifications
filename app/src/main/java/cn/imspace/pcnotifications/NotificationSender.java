@@ -9,6 +9,7 @@ import android.app.Notification;
 import android.content.SharedPreferences;
 import android.net.http.AndroidHttpClient;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -23,17 +24,20 @@ import org.json.*;
 
 public class NotificationSender {
     private NotificationFetcher mNotification;
-    private String mServer, mCode, mKey, mMethod;
+    private String mCode, mKey, mMethod, mDID;
     private URI mURI;
     private int mRetry=0;
+    private static final String TAG = "Sender";
     class Sender extends Thread {
         private String getString() {
             JSONObject tObj = new JSONObject();
             JSONObject msg = new JSONObject();
             try {
+                //TODO: 可变ROLE
                 tObj.put("role", "phone");
                 tObj.put("code", mCode);
                 tObj.put("key", mKey);
+                tObj.put("did", mDID);
                 tObj.put("cmd", "broadcast");
                 tObj.put("dest", "[all]");
                 msg.put("notification", mNotification.getJSONObject());
@@ -62,49 +66,55 @@ public class NotificationSender {
                 }
             } catch (Exception e) {
                 reSend = true;
-                System.out.println("Send Error.");
-                System.out.println();
+                Log.i(TAG, "Send Error.");
                 e.printStackTrace();
             } finally {
                 httpClient.close();
             }
-            if (reSend && (mRetry++ < 5)) {
+            if (reSend && (mRetry++ < 6)) {
                 try {
                     Thread.sleep(10000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Sender sender = new Sender();
-                sender.start();
+                run();
             }
         }
     }
-    public NotificationSender (Notification notification, SharedPreferences spReader) throws URISyntaxException{
+    public NotificationSender (Notification notification, ConnectionConfig cc) throws URISyntaxException{
         mNotification = new NotificationFetcher(notification);
-        mServer = spReader.getString("server", "http://203.195.196.109:8765/");
-        mCode = spReader.getString("code", "debug");
-        mKey = spReader.getString("key", "debug");
+        mURI = cc.getServer();
+        mCode = cc.getCode();
+        mKey = cc.getKey();
+        mDID = cc.getDID();
         mMethod = "Posted";
-        mURI = new URI(mServer);
     }
     @TargetApi(18)
-    public NotificationSender (String method, StatusBarNotification sbn, SharedPreferences spReader) throws URISyntaxException{
+    public NotificationSender (String method, StatusBarNotification sbn, ConnectionConfig cc) {
         Notification notification = sbn.getNotification();
-        mNotification = new NotificationFetcher(notification, sbn.getId());
-        mServer = spReader.getString("server", "http://203.195.196.109:8765/");
-        mCode = spReader.getString("code", "debug");
-        mKey = spReader.getString("key", "debug");
+        mNotification = new NotificationFetcher(notification, getId(sbn));
+        mURI = cc.getServer();
+        mCode = cc.getCode();
+        mKey = cc.getKey();
+        mDID = cc.getDID();
         mMethod = method;
         mNotification.setPackage(sbn.getPackageName());
         mNotification.setPostTime(sbn.getPostTime());
-        mURI = new URI(mServer);
     }
     public void send() throws Exception {
-        if (mServer.isEmpty() || mCode.isEmpty() || mKey.isEmpty()) {
+        if (mCode.isEmpty() || mKey.isEmpty()) {
             throw new Exception("a");
         }
         Sender sender = new Sender();
         sender.start();
+    }
+    @TargetApi(18)
+    private String getId(StatusBarNotification sbn) {
+        String tag = sbn.getTag();
+        if (tag==null) {
+            tag = "{[null]}";
+        }
+        return sbn.getPackageName()+";;"+tag+";;"+sbn.getId();
     }
 }
 

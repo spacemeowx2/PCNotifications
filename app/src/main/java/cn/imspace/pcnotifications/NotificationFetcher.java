@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.lang.reflect.Field;
 import java.util.Date;
 import android.app.Notification;
+import android.util.Log;
 import android.widget.RemoteViews;
 import org.json.JSONObject;
 
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 public class NotificationFetcher {
     public static final int ID_CONTENT_TEXT = 0x1020046;
     public static final int ID_TITLE_TEXT = 0x1020016;
+    private static final String TAG = "Fetcher";
     private Object getActions (RemoteViews remoteViews) throws Exception{
         Class<?> remoteViewsType = remoteViews.getClass();
         Field field = remoteViewsType.getDeclaredField("mActions");
@@ -44,9 +46,9 @@ public class NotificationFetcher {
         }
     }
     private ArrayList<BriefAction> mActions = new ArrayList<>();
-    String mTitleText="", mContentText="", mPackage="";
+    String mTitleText="", mContentText="", mPackage="", mId="";
     long mPostTime=0;
-    int mId=0, mFlags=0;
+    int mFlags=0;
     boolean mHasId = false;
     public void setPackage(String name) { mPackage = name;}
     public void setPostTime(long time) {mPostTime = time;}
@@ -68,10 +70,10 @@ public class NotificationFetcher {
     }
     public NotificationFetcher(Notification notification) {
         //@RemoteViews.java:1714
-        this(notification, 0);
+        this(notification, "");
         mHasId = false;
     }
-    public NotificationFetcher(Notification notification, int id) {
+    public NotificationFetcher(Notification notification, String id) {
         mId = id;
         mHasId = true;
         mPostTime = new Date().getTime();
@@ -107,9 +109,9 @@ public class NotificationFetcher {
             } else if (action.viewId == ID_CONTENT_TEXT) {
                 mContentText = action.value.toString();
             } else {
-                System.out.println("Unknown Text");
-                System.out.println(action.value.toString());
-                System.out.println(action.viewId);
+                Log.w(TAG, "Unknown Text");
+                Log.w(TAG, action.value.toString());
+                Log.w(TAG, String.valueOf(action.viewId));
             }
         }
     }
