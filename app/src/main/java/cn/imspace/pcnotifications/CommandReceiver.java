@@ -16,6 +16,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URI;
@@ -76,7 +77,7 @@ public  class CommandReceiver  {
             String responseText;
             AndroidHttpClient httpClient = AndroidHttpClient.newInstance("");
             httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT,10000000);//连接时间
-            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,10000000);//数据传输时间
+            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,10000000);         //数据传输时间
             HttpPost requestPost = new HttpPost(mURI);
             HttpEntity requestEntity = new ByteArrayEntity(mRequestText.getBytes());
             requestPost.setEntity(requestEntity);
@@ -116,7 +117,7 @@ public  class CommandReceiver  {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                run();
+                get();
             }
         }
     }
@@ -127,22 +128,25 @@ public  class CommandReceiver  {
         private void remove(JSONObject tRet) throws Exception {
             if (self.mContext instanceof NotificationListenerService) {
                 NotificationListenerService nls = (NotificationListenerService) self.mContext;
-                String pkg, tag;
-                int id;
-                String[] parts = tRet.getJSONObject("notification").getString("id").split(";;");
-                pkg = parts[0];
-                tag = parts[1];
-                if (tag.equals("{[null]}")) {
-                    tag = null;
+                JSONArray ids = tRet.getJSONObject("msg").getJSONArray("id");
+                for (int i=0; i<ids.length(); i++) {
+                    String pkg, tag;
+                    int id;
+                    String[] parts = ids.getString(i).split(";;");
+                    pkg = parts[0];
+                    tag = parts[1];
+                    if (tag.equals("{[null]}")) {
+                        tag = null;
+                    }
+                    id = Integer.parseInt(parts[2]);
+                    nls.cancelNotification(pkg, tag, id);
                 }
-                id = Integer.parseInt(parts[2]);
-                nls.cancelNotification(pkg, tag, id);
             } else if (self.mContext instanceof AccessibilityService) {
                 AccessibilityService as = (AccessibilityService) self.mContext;
             }
         }
         public void handleMessage(Message msg) {
-            if (msg.what== MSG_OK) {
+            if (msg.what == MSG_OK) {
                 try {
                     self = (CommandReceiver)msg.obj;
                     JSONObject tRet = new JSONObject(msg.getData().getString("json"));

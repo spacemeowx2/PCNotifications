@@ -35,19 +35,23 @@ function newCode(table) {
 function needNewDID(args) {
   return args.did=='debug';
 }
-function handler(args) {
-  if (!codeTable.hasOwnProperty(args.code)) {
-    codeTable[args.code] = [];
-  }
-  if (!deviceTable.hasOwnProperty(args.did)) {
-    deviceTable[args.did] = {name:'No Name',role:args.role,lasttime:0,online:false,msgs:[]};
-  }
-  if (codeTable[args.code].indexOf(args.did)==-1) {
-    codeTable[args.code].push(args.did);
-  }
-  var ret = {'ok':true};
-  switch (args.cmd) {
-  case 'broadcast':
+var subHandler = {};
+(function (){
+  subHandler.sendto = function sendto(args,ret) {
+    if (codeTable[args.code].indexOf(args.dest)!=-1) {
+      var device = deviceTable[args.dest];
+      args.cmd = args.destcmd;
+      if (device.online) {
+        device.online.send(args, function (){ //on error
+          device.msgs.push(args);
+        });
+      } else {
+        device.msgs.push(args);
+      }
+    }
+    return ret;
+  };
+  subHandler.broadcast = function broadcast(args,ret) {
     console.log(args);
     var destdevices = codeTable[args.code].filter(function (did) {return did!=args.did;});
     destdevices = destdevices.map(function (did) {
@@ -69,11 +73,13 @@ function handler(args) {
         device.msgs.push(args);
       });
     });
-    break;
-  case 'get':
+    return ret;
+  };
+  subHandler.get = function get(args,ret) {
     if (needNewDID(args)) {
       var newdid = newCode(deviceTable);
-      ret = {'ok':true,'cmd':'did','did':newdid};
+      ret.cmd=did;
+      ret.did=newdid;
       deviceTable[newdid] = {name:'No Name',role:args.role,online:false,msgs:[]};
     } else if (deviceTable[args.did].msgs.length>0) {
       ret = deviceTable[args.did].msgs.shift();
@@ -81,7 +87,26 @@ function handler(args) {
     } else {
       return false; //do not end the response, and wait for other messages.
     }
-    break;
+    return ret;
+  };
+})();
+function handler(args) {
+  //------------------------------
+  if (!codeTable.hasOwnProperty(args.code)) {
+    codeTable[args.code] = [];
+  }
+  if (!deviceTable.hasOwnProperty(args.did)) {
+    deviceTable[args.did] = {name:'No Name',role:args.role,lasttime:0,online:false,msgs:[]};
+  }
+  if (codeTable[args.code].indexOf(args.did)==-1) {
+    codeTable[args.code].push(args.did);
+  }
+  var ret = {'ok':true};
+  if (subHandler.hasOwnProperty(args.cmd)) {
+    console.log(subHandler[args.cmd])
+    ret = subHandler[args.cmd](args,ret);
+  } else {
+    ret.ok = false;
   }
   return ret;
 }
