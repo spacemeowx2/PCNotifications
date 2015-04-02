@@ -13,17 +13,16 @@ import java.net.URI;
 
 
 public class ConnectionConfig {
-    MyHandler mHandler;
     SharedPreferences.Editor mConnectionSPE, mServerSPE;
     SharedPreferences mConnection, mServerList;
     private static final String CONNECTION_NAME = "connection";
     private static final String SERVER_NAME = "serverlist";
-    private static class MyHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-        }
-    }
+//    private static class MyHandler extends Handler {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            super.handleMessage(msg);
+//        }
+//    }
     public String getServerString() {
         return mConnection.getString("server", "http://203.195.196.109:8765/");
     }
@@ -41,17 +40,11 @@ public class ConnectionConfig {
         }
         return tURI;
     }
-    public String getDID() {
-        //TODO
-        return mServerList.getString(getServerString(), "debug");
-    }
     public String getCode() {
-        //TODO
-        return "debug";
+        return getConfig("code", "debug");
     }
     public String getKey() {
-        //TODO
-        return "debug";
+        return getConfig("key", "debug");
     }
     public String getName() {
         return mConnection.getString("name", android.os.Build.MODEL);
@@ -59,8 +52,16 @@ public class ConnectionConfig {
     public void setDID(String did) {
         mServerSPE.putString(getServerString(), did).commit();
     }
+    public String getDID() {
+        return mServerList.getString(getServerString(), "debug");
+    }
+    public void setConfig(String name, String value) {
+        mConnectionSPE.putString(name, value).commit();
+    }
+    public String getConfig(String name, String def) {
+        return mConnection.getString(name, def);
+    }
     ConnectionConfig(Context context) {
-        mHandler = new MyHandler();
         mConnectionSPE = context.getSharedPreferences(CONNECTION_NAME, Context.MODE_MULTI_PROCESS).edit();
         mServerSPE =  context.getSharedPreferences(SERVER_NAME, Context.MODE_MULTI_PROCESS).edit();
         mConnection = context.getSharedPreferences(CONNECTION_NAME, Context.MODE_MULTI_PROCESS);

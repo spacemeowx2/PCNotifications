@@ -27,6 +27,7 @@ public class NotificationListeningService extends NotificationListenerService {
         mcr.stop();
     }
     public void onNotificationPosted(StatusBarNotification sbn) {
+        //android.os.Debug.waitForDebugger();
         Notification notification = sbn.getNotification();
         if ((notification.flags & NotificationCompat.FLAG_ONGOING_EVENT) == 0) {
             try {

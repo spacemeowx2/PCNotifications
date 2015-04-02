@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.http.AndroidHttpClient;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -125,10 +126,10 @@ public  class CommandReceiver  {
     {
         CommandReceiver self;
         @TargetApi(18)
-        private void remove(JSONObject tRet) throws Exception {
-            if (self.mContext instanceof NotificationListenerService) {
+        private void remove(JSONObject msg) throws Exception {
+            if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN_MR2 && self.mContext instanceof NotificationListenerService) {
                 NotificationListenerService nls = (NotificationListenerService) self.mContext;
-                JSONArray ids = tRet.getJSONObject("msg").getJSONArray("id");
+                JSONArray ids = msg.getJSONArray("id");
                 for (int i=0; i<ids.length(); i++) {
                     String pkg, tag;
                     int id;
@@ -143,6 +144,7 @@ public  class CommandReceiver  {
                 }
             } else if (self.mContext instanceof AccessibilityService) {
                 AccessibilityService as = (AccessibilityService) self.mContext;
+                //ignored
             }
         }
         public void handleMessage(Message msg) {
@@ -151,10 +153,19 @@ public  class CommandReceiver  {
                     self = (CommandReceiver)msg.obj;
                     JSONObject tRet = new JSONObject(msg.getData().getString("json"));
                     String cmd = tRet.getString("cmd");
-                    if (cmd.equals("remove")) {
-                        remove(tRet);
-                    } else if(cmd.equals("did")) {
+                    if(cmd.equals("did")) {
                         self.mcc.setDID(tRet.getString("did"));
+                    } else {
+                        //TODO: DECODE
+                        JSONObject tMsg = new JSONObject(tRet.getString("msg"));
+                        switch (tMsg.getString("method")) {
+                            case "Removed":
+                                remove(tMsg);
+                                break;
+                            case "Posted":
+                                Log.i(TAG, "Received other devices' post.");
+                                break;
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -42,10 +42,11 @@ public class NotificationSender {
                 tObj.put("cmd", "broadcast");
                 tObj.put("dest", "[all]");
                 msg.put("notification", mNotification.getJSONObject());
-                if (mMethod!=null && !mMethod.isEmpty()) {
+                if (mMethod!=null && !mMethod.equals("")) {
                     msg.put("method", mMethod);
                 }
-                tObj.put("msg", msg);
+                //TODO ENCODE
+                tObj.put("msg", msg.toString());
             } catch(Exception e) {
                 e.printStackTrace();
             }
@@ -105,9 +106,6 @@ public class NotificationSender {
         mNotification.setPostTime(sbn.getPostTime());
     }
     public void send() throws Exception {
-        if (mCode.isEmpty() || mKey.isEmpty()) {
-            throw new Exception("a");
-        }
         Sender sender = new Sender();
         sender.start();
     }
@@ -120,52 +118,3 @@ public class NotificationSender {
         return sbn.getPackageName()+";;"+tag+";;"+sbn.getId();
     }
 }
-
-//import java.security.Key;
-//import javax.crypto.Cipher;
-//import javax.crypto.spec.SecretKeySpec;
-//    private static final String AESTYPE ="AES/ECB/PKCS5Padding";
-//    private static String getBase64(byte[] s) {
-//        return (new sun.misc.BASE64Encoder()).encode(s);
-//    }
-//    private static byte[] getFromBase64(String s) {
-//        if (s == null) return null;
-//        try {
-//            return (new sun.misc.BASE64Decoder()).decodeBuffer(s);
-//        } catch (Exception e) {
-//            return null;
-//        }
-//    }
-//    public static String AES_Encrypt(String keyStr, String plainText) {
-//        byte[] encrypt = null;
-//        try{
-//            Key key = generateKey(keyStr);
-//            Cipher cipher = Cipher.getInstance(AESTYPE);
-//            cipher.init(Cipher.ENCRYPT_MODE, key);
-//            encrypt = cipher.doFinal(plainText.getBytes());
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//        return getBase64(encrypt);
-//    }
-//    public static String AES_Decrypt(String keyStr, String encryptData) {
-//        byte[] decrypt = null;
-//        try{
-//            Key key = generateKey(keyStr);
-//            Cipher cipher = Cipher.getInstance(AESTYPE);
-//            cipher.init(Cipher.DECRYPT_MODE, key);
-//            decrypt = cipher.doFinal(getFromBase64(encryptData));
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//        return new String(decrypt).trim();
-//    }
-//    private static Key generateKey(String key)throws Exception{
-//        try{
-//            SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
-//            return keySpec;
-//        }catch(Exception e){
-//            e.printStackTrace();
-//            throw e;
-//        }
-//    }

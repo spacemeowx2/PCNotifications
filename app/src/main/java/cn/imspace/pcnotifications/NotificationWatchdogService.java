@@ -25,9 +25,9 @@ public class NotificationWatchdogService extends AccessibilityService {
         if (event.getEventType()==AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
             Log.i(TAG, "onAccessibilityEvent");
             Log.i(TAG, (String) event.getPackageName());
-            for (CharSequence subText: event.getText()) {
-                Log.i(TAG, (String) subText);
-            }
+//            for (CharSequence subText: event.getText()) {
+//                Log.i(TAG, (String) subText);
+//            }
             Parcelable data = event.getParcelableData();
             if (data instanceof Notification) {
                 Notification notification = (Notification) data;

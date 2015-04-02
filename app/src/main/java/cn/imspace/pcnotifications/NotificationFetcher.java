@@ -3,6 +3,8 @@ package cn.imspace.pcnotifications;
 import java.util.ArrayList;
 import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.NoSuchElementException;
+
 import android.app.Notification;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -17,16 +19,34 @@ public class NotificationFetcher {
     public static final int ID_TITLE_TEXT = 0x1020016;
     public static final int ID_TITLE_TEXT2 = 0x7F0D0BA3;
     private static final String TAG = "Fetcher";
+    private Field superGetDeclaredField(Class<?> cls, String filedName) {
+        Field field=null;
+        Class<?> mCls = cls;
+        for (;field==null && (!mCls.getName().equals("java.lang.Object"));mCls=mCls.getSuperclass()) {
+            //Log.i(TAG, mCls.getName());
+            try {
+                field = mCls.getDeclaredField(filedName);
+            } catch (NoSuchFieldException e) {
+                field = null;
+            }
+        }
+        if (field == null) {
+            throw new NoSuchElementException();
+        }
+        return field;
+    }
     private Object getActions (RemoteViews remoteViews) throws Exception{
         Class<?> remoteViewsType = remoteViews.getClass();
-        Field field = remoteViewsType.getDeclaredField("mActions");
+        //Field field = remoteViewsType.getDeclaredField("mActions");
+        Field field = superGetDeclaredField(remoteViewsType, "mActions");
         field.setAccessible(true);
         return field.get(remoteViews);
     }
     private Object getActionDetail(Object action, Class<?> actionType, String fieldStr, Object defaultValue) {
         //Class<?> actionType = action.getClass();
         try {
-            Field field = actionType.getDeclaredField(fieldStr);
+            //Field field = actionType.getDeclaredField(fieldStr);
+            Field field = superGetDeclaredField(actionType, fieldStr);
             field.setAccessible(true);
             Object tRet = field.get(action);
             if (tRet == null)
@@ -80,6 +100,7 @@ public class NotificationFetcher {
         mHasId = true;
         mPostTime = new Date().getTime();
         mFlags = notification.flags;
+
         RemoteViews remoteViews = notification.contentView;
         ArrayList<Object> actions;
         try {
@@ -87,18 +108,18 @@ public class NotificationFetcher {
             actions = (ArrayList<Object>) getActions(remoteViews);
         } catch (Exception e) {
             actions = new ArrayList<Object>();
-            //e.printStackTrace();
+            e.printStackTrace();
         }
         for (Object action: actions) {
             Object tMethodName, tValue, tViewId;
             tMethodName = getActionDetail(action, action.getClass(), "methodName", "NoName");
-            tValue = getActionDetail(action, action.getClass(), "value", "Nothing");
-            tViewId = getActionDetail(action, action.getClass().getSuperclass(), "viewId", 0);
+            tValue = getActionDetail(action, action.getClass(), "value", null);
+            tViewId = getActionDetail(action, action.getClass(), "viewId", 0);
             mActions.add(new BriefAction(tMethodName, tValue, tViewId));
         }
         ArrayList<BriefAction> toDelete = new ArrayList<>();
         for (BriefAction action: mActions) {
-            if (!action.methodName.equals("setText")) {
+            if (!action.methodName.equals("setText") || action.value==null) {
                 toDelete.add(action);
             }
         }
@@ -125,28 +146,23 @@ public class NotificationFetcher {
         for (BriefAction action: toDelete) {
             mActions.remove(action);
         }
-        switch(mActions.size()) {
-            case 0:
+        if (textCount==0) {
+            if (mActions.size()==0) {
                 mTitleText = "";
                 mContentText = "";
-                break;
-            case 1:
-                if (textCount==0) {
-                    mTitleText = mActions.get(0).value.toString();
-                }
-                break;
-            default:
-                if (textCount==0) {
-                    mTitleText = mActions.get(0).value.toString();
-                    mContentText = mActions.get(1).value.toString();
-                } else if (textCount==1) {
-                    if (mTitleText == null) {
-                        mTitleText = mActions.get(0).value.toString();
-                    } else if (mContentText == null) {
-                        mContentText = mActions.get(0).value.toString();
-                    }
-                }
-                break;
+            } else if (mActions.size()==1) {
+                mTitleText = mActions.get(0).value.toString();
+                mContentText = "";
+            } else if (mActions.size()>=2) {
+                mTitleText = mActions.get(0).value.toString();
+                mContentText = mActions.get(1).value.toString();
+            }
+        } else if (textCount==1) {
+            if (mTitleText == null) {
+                mTitleText = mActions.get(0).value.toString();
+            } else if (mContentText == null) {
+                mContentText = mActions.get(0).value.toString();
+            }
         }
     }
 }

@@ -16,10 +16,12 @@
 
     <string name="text_setup_code_title">1. Code Setting</string>
     <string name="text_setup_code_description">Setting code to identify who you are.</string>
-    <string name="text_setup_access_title">2. Notification Access</string>
-    <string name="text_setup_access_description">Enable </string>
-    <string name="text_setup_pc_title">3. PC Client</string>
+    <string name="text_setup_key_title">2. Key</string>
+    <string name="text_setup_key_description">Set a key to encrypt your notifications.</string>
+    <string name="text_setup_access_title">3. Notification Access</string>
+    <string name="text_setup_access_description">Enable <b>PC Notifications</b> in the Notification Access settings</string>
+    <string name="text_setup_pc_title">4. PC Client</string>
     <string name="text_setup_pc_description">Install browser extension on pc.\n\nhttp://somewhere/</string>
-    <string name="text_setup_test_title">4. Test</string>
+    <string name="text_setup_test_title">5. Test</string>
     <string name="text_setup_test_description">Press the button below to create a test notification.</string>
 </resources>

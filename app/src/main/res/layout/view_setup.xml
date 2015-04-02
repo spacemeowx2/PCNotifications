@@ -1,60 +1,69 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <ScrollView
+    android:layout_height="wrap_content">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <LinearLayout style="@style/widget_panel" android:orientation="vertical">
-                <TextView style="@style/widget_panel_title"
-                    android:text="@string/text_setup_code_title" />
-                <TextView style="@style/widget_panel_context"
-                    android:text="@string/text_setup_code_description" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout style="@style/widget_panel" android:orientation="vertical">
+            <TextView style="@style/widget_panel_title"
+                android:text="@string/text_setup_code_title" />
+            <TextView style="@style/widget_panel_context"
+                android:text="@string/text_setup_code_description" />
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/editText_code"
-                    android:layout_gravity="center_horizontal"
-                    android:inputType="textShortMessage|text"
-                    android:clickable="true"
-                    android:textAlignment="center" />
-            </LinearLayout>
-            <LinearLayout style="@style/widget_panel" android:orientation="vertical">
-                <TextView style="@style/widget_panel_title"
-                    android:text="@string/text_setup_access_title" />
-                <TextView style="@style/widget_panel_context"
-                    android:text="@string/text_setup_access_description" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/open_system_settings"
-                    android:id="@+id/button"
-                    android:onClick="openSystemSettings"
-                    android:layout_gravity="center"/>
-            </LinearLayout>
-            <LinearLayout style="@style/widget_panel" android:orientation="vertical">
-                <TextView style="@style/widget_panel_title"
-                    android:text="@string/text_setup_pc_title" />
-                <TextView style="@style/widget_panel_context"
-                    android:text="@string/text_setup_pc_description" />
-            </LinearLayout>
-            <LinearLayout style="@style/widget_panel" android:orientation="vertical">
-                <TextView style="@style/widget_panel_title"
-                    android:text="@string/text_setup_test_title" />
-                <TextView style="@style/widget_panel_context"
-                    android:text="@string/text_setup_test_description" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/button_test"
-                    android:id="@+id/test_button"
-                    android:onClick="test"
-                    android:layout_gravity="center"/>
-            </LinearLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText_code"
+                android:layout_gravity="center_horizontal"
+                android:inputType="textShortMessage|text"
+                android:clickable="true" />
         </LinearLayout>
-    </ScrollView>
-</FrameLayout>
+        <LinearLayout style="@style/widget_panel" android:orientation="vertical">
+            <TextView style="@style/widget_panel_title"
+                android:text="@string/text_setup_key_title" />
+            <TextView style="@style/widget_panel_context"
+                android:text="@string/text_setup_key_description" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText_key"
+                android:layout_gravity="center_horizontal"
+                android:inputType="textShortMessage|text"
+                android:clickable="true" />
+        </LinearLayout>
+        <LinearLayout style="@style/widget_panel" android:orientation="vertical">
+            <TextView style="@style/widget_panel_title"
+                android:text="@string/text_setup_access_title" />
+            <TextView style="@style/widget_panel_context"
+                android:text="@string/text_setup_access_description" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/open_system_settings"
+                android:id="@+id/button"
+                android:onClick="openSystemSettings"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+        <LinearLayout style="@style/widget_panel" android:orientation="vertical">
+            <TextView style="@style/widget_panel_title"
+                android:text="@string/text_setup_pc_title" />
+            <TextView style="@style/widget_panel_context"
+                android:text="@string/text_setup_pc_description" />
+        </LinearLayout>
+        <LinearLayout style="@style/widget_panel" android:orientation="vertical">
+            <TextView style="@style/widget_panel_title"
+                android:text="@string/text_setup_test_title" />
+            <TextView style="@style/widget_panel_context"
+                android:text="@string/text_setup_test_description" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_test"
+                android:id="@+id/test_button"
+                android:onClick="test"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

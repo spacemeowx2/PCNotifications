@@ -14,12 +14,14 @@
     <string name="apps_tip">提示</string>
     <string name="text_setup_code_title">1. 设置Code</string>
     <string name="text_setup_code_description">设置Code来区分用户(一个人应该拥有一个Code)</string>
-    <string name="text_setup_access_title">2. 通知权限</string>
+    <string name="text_setup_access_title">3. 通知权限</string>
     <string name="text_setup_access_description">在"通知读取权限"中启用"桌面通知"的权限.</string>
     <string name="open_system_settings">启用权限</string>
-    <string name="text_setup_pc_title">3. 电脑客户端安装</string>
+    <string name="text_setup_pc_title">4. 电脑客户端安装</string>
     <string name="text_setup_pc_description">在电脑上安装Chrome插件.\n\nhttp://somewhere/</string>
-    <string name="text_setup_test_title">4. 测试</string>
+    <string name="text_setup_test_title">5. 测试</string>
     <string name="text_setup_test_description">按下面的按钮来测试功能.</string>
     <string name="button_test">测试</string>
+    <string name="text_setup_key_description">设置Key来加密你的信息.</string>
+    <string name="text_setup_key_title">2. 设置Key</string>
 </resources>
